@@ -18,7 +18,7 @@
         <a href="meals">Back</a><br>
         <hr>
         <h1>Edit Meal</h1><br>
-        <form action="meals?action=edit&id=<%writer.print(id);%>" method="post">
+        <form action="meals?action=edit&id=<%=id%>" method="post">
           <label for="date">DateTime:</label>
           <input type="datetime-local" name="date" id="date">
           <label for="description">Description</label>

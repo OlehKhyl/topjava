@@ -22,7 +22,7 @@
 
         <a href="addMeal.jsp">Add Meal</a>
         <%
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
             List<MealTo> meals = (List<MealTo>) request.getAttribute("meals");
             PrintWriter writer = response.getWriter();
@@ -52,7 +52,7 @@
                 writer.println(meal.getCalories());
                 writer.println("</td>");
                 writer.println("<td>");
-                writer.println("<a href=\"editMeal.jsp?id=" + meal.getId() + "\">Delete</a>");
+                writer.println("<a href=\"editMeal.jsp?id=" + meal.getId() + "\">Edit</a>");
                 writer.println("</td>");
                 writer.println("<td>");
                 writer.println("<a href=\"meals?action=delete&id=" + meal.getId() + "\">Delete</a>");

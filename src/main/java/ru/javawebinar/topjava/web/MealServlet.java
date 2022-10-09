@@ -66,9 +66,18 @@ public class MealServlet extends HttpServlet {
         LocalDateTime date = LocalDateTime.parse(req.getParameter("date"));
         String description = req.getParameter("description");
         int calories = Integer.parseInt(req.getParameter("calories"));
-        Meal newMeal = new Meal(date, description, calories);
-        logger.debug("add new meal".concat(" ").concat(newMeal.toString()));
-        storage.put(newMeal.getId(), newMeal);
+        if (req.getParameter("action") != null) {
+            if (req.getParameter("action").equals("edit")) {
+                Integer id = Integer.parseInt(req.getParameter("id"));
+                Meal mealToUpdate = new Meal(id, date, description, calories);
+                logger.debug("update meal".concat(" ").concat(mealToUpdate.getId().toString()));
+                storage.put(mealToUpdate.getId(), mealToUpdate);
+            }
+        } else {
+            Meal newMeal = new Meal(date, description, calories);
+            logger.debug("add new meal".concat(" ").concat(newMeal.toString()));
+            storage.put(newMeal.getId(), newMeal);
+        }
         logger.debug("redirect to meals");
         resp.sendRedirect("meals");
     }
