@@ -19,6 +19,8 @@
     </style>
 </head>
 <body>
+
+        <a href="addMeal.jsp">Add Meal</a>
         <%
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
 
@@ -38,6 +40,9 @@
 
                 writer.println("<tr style=\"color:" + color +"\">");
                 writer.println("<td>");
+                writer.println(meal.getId());
+                writer.println("</td>");
+                writer.println("<td>");
                 writer.println(formatter.format(meal.getDateTime()));
                 writer.println("</td>");
                 writer.println("<td>");
@@ -45,6 +50,12 @@
                 writer.println("</td>");
                 writer.println("<td>");
                 writer.println(meal.getCalories());
+                writer.println("</td>");
+                writer.println("<td>");
+                writer.println("<a href=\"editMeal.jsp?id=" + meal.getId() + "\">Delete</a>");
+                writer.println("</td>");
+                writer.println("<td>");
+                writer.println("<a href=\"meals?action=delete&id=" + meal.getId() + "\">Delete</a>");
                 writer.println("</td>");
                 writer.println("</tr>");
             }
