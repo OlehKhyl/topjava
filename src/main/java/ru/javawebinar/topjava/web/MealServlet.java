@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.meal.MealRestController;
 
@@ -13,9 +14,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(MealServlet.class);
@@ -70,8 +76,19 @@ public class MealServlet extends HttpServlet {
             case "all":
             default:
                 log.info("getAll");
+                LocalDate dateFrom = request.getParameter("dateFrom") != null && !request.getParameter("dateFrom").isEmpty() ? LocalDate.parse(request.getParameter("dateFrom")) : LocalDate.MIN;
+                LocalDate dateTo = request.getParameter("dateTo") != null && !request.getParameter("dateTo").isEmpty() ? LocalDate.parse(request.getParameter("dateTo")) : LocalDate.MAX;
+
+                LocalTime timeFrom = request.getParameter("timeFrom") != null && !request.getParameter("timeFrom").isEmpty() ? LocalTime.parse(request.getParameter("timeFrom")) : LocalTime.MIN;
+                LocalTime timeTo = request.getParameter("timeTo") != null && !request.getParameter("timeTo").isEmpty() ? LocalTime.parse(request.getParameter("timeTo")) : LocalTime.MAX;
+
+
+
                 request.setAttribute("meals",
-                        MealsUtil.getTos(controller.getAll(SecurityUtil.authUserId()), MealsUtil.DEFAULT_CALORIES_PER_DAY));
+                        MealsUtil.getTos(controller.getAll(SecurityUtil.authUserId()), MealsUtil.DEFAULT_CALORIES_PER_DAY)
+                                .stream().filter((m) -> DateTimeUtil.isBetweenDate(m.getDateTime().toLocalDate(), dateFrom, dateTo))
+                                .filter((m) -> DateTimeUtil.isBetweenHalfOpen(m.getDateTime().toLocalTime(), timeFrom, timeTo))
+                                .collect(Collectors.toList()));
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
         }
