@@ -1,6 +1,8 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.Stopwatch;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -11,8 +13,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
+import javax.persistence.NoResultException;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -26,24 +32,44 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
+    public static String log;
+
+    @BeforeClass
+    public static void LogInit() {
+        log = "";
+    }
+
 
     @Autowired
     private MealService service;
 
+    @Rule
+    public final Stopwatch time = new Stopwatch();
+
+
+    @Rule
+    public final TestName name = new TestName();
+
     @Test
     public void delete() {
         service.delete(MEAL1_ID, USER_ID);
-        assertThrows(NotFoundException.class, () -> service.get(MEAL1_ID, USER_ID));
+        assertThrows(NoResultException.class, () -> service.get(MEAL1_ID, USER_ID));
+        log += name.getMethodName() + " " + time.runtime(TimeUnit.NANOSECONDS) + "ns \n";
+        System.out.println(time.runtime(TimeUnit.NANOSECONDS) + "ns \n");
     }
 
     @Test
     public void deleteNotFound() {
         assertThrows(NotFoundException.class, () -> service.delete(NOT_FOUND, USER_ID));
+        log += name.getMethodName() + " " + time.runtime(TimeUnit.NANOSECONDS) + "ns \n";
+        System.out.println(time.runtime(TimeUnit.NANOSECONDS) + "ns \n");
     }
 
     @Test
     public void deleteNotOwn() {
         assertThrows(NotFoundException.class, () -> service.delete(MEAL1_ID, ADMIN_ID));
+        log += name.getMethodName() + " " + time.runtime(TimeUnit.NANOSECONDS) + "ns \n";
+        System.out.println(time.runtime(TimeUnit.NANOSECONDS) + "ns \n");
     }
 
     @Test
@@ -52,60 +78,90 @@ public class MealServiceTest {
         int newId = created.id();
         Meal newMeal = getNew();
         newMeal.setId(newId);
-        MEAL_MATCHER.assertMatch(created, newMeal);
-        MEAL_MATCHER.assertMatch(service.get(newId, USER_ID), newMeal);
+        Assert.assertEquals(created, newMeal);
+        Assert.assertEquals(service.get(newId, USER_ID), newMeal);
+        log += name.getMethodName() + " " + time.runtime(TimeUnit.NANOSECONDS) + "ns \n";
+        System.out.println(time.runtime(TimeUnit.NANOSECONDS) + "ns \n");
     }
 
     @Test
     public void duplicateDateTimeCreate() {
         assertThrows(DataAccessException.class, () ->
                 service.create(new Meal(null, meal1.getDateTime(), "duplicate", 100), USER_ID));
+        log += name.getMethodName() + " " + time.runtime(TimeUnit.NANOSECONDS) + "ns \n";
+        System.out.println(time.runtime(TimeUnit.NANOSECONDS) + "ns \n");
     }
 
     @Test
     public void get() {
         Meal actual = service.get(ADMIN_MEAL_ID, ADMIN_ID);
-        MEAL_MATCHER.assertMatch(actual, adminMeal1);
+        Assert.assertEquals(actual, adminMeal1);
+        log += name.getMethodName() + " " + time.runtime(TimeUnit.NANOSECONDS) + "ns \n";
+        System.out.println(time.runtime(TimeUnit.NANOSECONDS) + "ns \n");
     }
 
     @Test
     public void getNotFound() {
-        assertThrows(NotFoundException.class, () -> service.get(NOT_FOUND, USER_ID));
+        assertThrows(NoResultException.class, () -> service.get(NOT_FOUND, USER_ID));
+        log += name.getMethodName() + " " + time.runtime(TimeUnit.NANOSECONDS) + "ns \n";
+        System.out.println(time.runtime(TimeUnit.NANOSECONDS) + "ns \n");
     }
 
     @Test
     public void getNotOwn() {
-        assertThrows(NotFoundException.class, () -> service.get(MEAL1_ID, ADMIN_ID));
+        Assert.assertThrows(NoResultException.class, () -> service.get(MEAL1_ID, ADMIN_ID));
+        log += name.getMethodName() + " " + time.runtime(TimeUnit.NANOSECONDS) + "ns \n";
+        System.out.println(time.runtime(TimeUnit.NANOSECONDS) + "ns \n");
     }
 
     @Test
     public void update() {
         Meal updated = getUpdated();
         service.update(updated, USER_ID);
-        MEAL_MATCHER.assertMatch(service.get(MEAL1_ID, USER_ID), getUpdated());
+        Assert.assertEquals(service.get(MEAL1_ID, USER_ID), getUpdated());
+        log += name.getMethodName() + " " + time.runtime(TimeUnit.NANOSECONDS) + "ns \n";
+        System.out.println(time.runtime(TimeUnit.NANOSECONDS) + "ns \n");
     }
 
     @Test
     public void updateNotOwn() {
-        assertThrows(NotFoundException.class, () -> service.update(meal1, ADMIN_ID));
-        MEAL_MATCHER.assertMatch(service.get(MEAL1_ID, USER_ID), meal1);
+        assertThrows(NoResultException.class, () -> service.update(meal1, ADMIN_ID));
+        Assert.assertEquals(service.get(MEAL1_ID, USER_ID), meal1);
+        log += name.getMethodName() + " " + time.runtime(TimeUnit.NANOSECONDS) + "ns \n";
+        System.out.println(time.runtime(TimeUnit.NANOSECONDS) + "ns \n");
     }
 
     @Test
     public void getAll() {
-        MEAL_MATCHER.assertMatch(service.getAll(USER_ID), meals);
+        Assert.assertEquals(service.getAll(USER_ID), meals);
+        log += name.getMethodName() + " " + time.runtime(TimeUnit.NANOSECONDS) + "ns \n";
+        System.out.println(time.runtime(TimeUnit.NANOSECONDS) + "ns \n");
     }
 
     @Test
     public void getBetweenInclusive() {
-        MEAL_MATCHER.assertMatch(service.getBetweenInclusive(
+        List<Meal> expected = new ArrayList<>();
+        expected.add(meal3);
+        expected.add(meal2);
+        expected.add(meal1);
+        Assert.assertEquals(expected,
+                service.getBetweenInclusive(
                         LocalDate.of(2020, Month.JANUARY, 30),
-                        LocalDate.of(2020, Month.JANUARY, 30), USER_ID),
-                meal3, meal2, meal1);
+                        LocalDate.of(2020, Month.JANUARY, 30), USER_ID)
+                );
+        log += name.getMethodName() + " " + time.runtime(TimeUnit.NANOSECONDS) + "ns \n";
+        System.out.println(time.runtime(TimeUnit.NANOSECONDS) + "ns \n");
     }
 
     @Test
     public void getBetweenWithNullDates() {
-        MEAL_MATCHER.assertMatch(service.getBetweenInclusive(null, null, USER_ID), meals);
+        Assert.assertEquals(service.getBetweenInclusive(null, null, USER_ID), meals);
+        log += name.getMethodName() + " " + time.runtime(TimeUnit.NANOSECONDS) + "ns \n";
+        System.out.println(time.runtime(TimeUnit.NANOSECONDS) + "ns \n");
+    }
+
+    @AfterClass
+    public static void LogInfo() {
+        System.out.println(log);
     }
 }
