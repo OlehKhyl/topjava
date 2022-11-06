@@ -7,5 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface CrudMealRepository extends JpaRepository<Meal, Integer> {
-    List<Meal> getMealsByDateTimeAfterAndDateTimeBeforeOrderByDateTimeDesc(LocalDateTime start, LocalDateTime end);
+    Meal getMealById(int id);
+    List<Meal> getMealsByUserIdOrderByDateTimeDesc(int userId);
+    List<Meal> getMealsByDateTimeAfterAndDateTimeBeforeAndUserIdOrderByDateTimeDesc(LocalDateTime start, LocalDateTime end, int userId);
 }
