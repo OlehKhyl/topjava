@@ -18,6 +18,7 @@
 
         <spring.version>5.3.23</spring.version>
         <spring-data-jpa.version>2.7.5</spring-data-jpa.version>
+        <jackson.version>2.14.1</jackson.version>
         <tomcat.version>9.0.68</tomcat.version>
 
         <!-- Logging -->
@@ -36,8 +37,9 @@
         <ehcache.version>3.10.2</ehcache.version>
 
         <!--    Tests  -->
-        <junit.version>4.13.2</junit.version>
+        <junit.jupiter.version>5.9.1</junit.jupiter.version>
         <assertj.version>3.23.1</assertj.version>
+        <hamcrest.version>2.2</hamcrest.version>
     </properties>
 
     <build>
@@ -59,6 +61,7 @@
                 <version>3.3.2</version>
             </plugin>
             <plugin>
+                <!--https://junit.org/junit5/docs/current/user-guide/#running-tests-build-maven -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
@@ -214,13 +217,37 @@
             <artifactId>spring-webmvc</artifactId>
         </dependency>
 
+        <!--JSON-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-hibernate5</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
         <!--Test-->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>${hamcrest.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
@@ -237,6 +264,14 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>LATEST</version>
+        </dependency>
+
+        <!--        https://youtrack.jetbrains.com/issue/IDEA-231927  -->
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>1.9.1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
