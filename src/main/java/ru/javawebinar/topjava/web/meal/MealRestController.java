@@ -10,12 +10,15 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.to.MealTo;
 
 import java.net.URI;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping(value = MealRestController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 public class MealRestController extends AbstractMealController {
-    static final String REST_URL = "rest/meals";
+    static final String REST_URL = "/rest/meals";
 
     @Override
     @GetMapping
@@ -50,5 +53,16 @@ public class MealRestController extends AbstractMealController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@RequestBody Meal meal, @PathVariable int id) {
         super.update(meal, id);
+    }
+
+    @GetMapping("/byTime")
+    public List<MealTo> getBetween(@RequestParam String start, @RequestParam String end) {
+        LocalDateTime startDateTime = LocalDateTime.parse(start);
+        LocalDateTime endDateTime = LocalDateTime.parse(end);
+        LocalDate startDate = startDateTime.toLocalDate();
+        LocalTime startTime = startDateTime.toLocalTime();
+        LocalDate endDate = endDateTime.toLocalDate();
+        LocalTime endTime = endDateTime.toLocalTime();
+        return super.getBetween(startDate, startTime, endDate, endTime);
     }
 }
