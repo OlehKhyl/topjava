@@ -6,8 +6,10 @@ import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.to.MealBuilder;
 import ru.javawebinar.topjava.to.MealTo;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -23,6 +25,13 @@ public class MealUIController extends AbstractMealController {
         return super.getAll();
     }
 
+
+    @Override
+    @GetMapping("/{id}")
+    public Meal get(@PathVariable int id) {
+        return super.get(id);
+    }
+
     @Override
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -32,10 +41,12 @@ public class MealUIController extends AbstractMealController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void create(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTime,
-                       @RequestParam String description,
-                       @RequestParam int calories) {
-        super.create(new Meal(null, dateTime, description, calories));
+    public void create(@Valid MealBuilder mealBuilder) {
+        if (mealBuilder.isNew()) {
+            super.create(new Meal(null, LocalDateTime.parse(mealBuilder.getDateTime()), mealBuilder.getDescription(), mealBuilder.getCalories()));
+        } else {
+            super.update(new Meal(mealBuilder.getId(), LocalDateTime.parse(mealBuilder.getDateTime()), mealBuilder.getDescription(), mealBuilder.getCalories()), mealBuilder.id());
+        }
     }
 
     @Override
